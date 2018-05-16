@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crypto Gains Calculator</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.3.5"></script>
+</head>
+<body>
+<div id="app">
+
+    <h1>Calculate your potential profit</h1>
+    <div class="row">
+      <div class="container">
+        <marquee speed="normal" behavior="scroll">
+          <b  v-for="crypto in apiresult">{{ crypto.name }}: £{{ Number(crypto.price_gbp).toFixed(2) }} &nbsp; &nbsp; &nbsp;</b>
+        </marquee>
+      </div>
+    </div>
+    <form name="calculator" class="row">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="text" name="bought" placeholder="Initial Price" v-model="a">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="at" placeholder="Paid" v-model="b">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="future" placeholder="Current/Future Price" v-model="c">
+                </div>
+            </div>
+            <br><br>
+            <div class="row">
+                <input type="button" name="result" v-model="getTotal()">
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            message: 'Hello Vue!',
+            a: null,
+            b: null,
+            c: null,
+            apiresult: []
+        },
+        mounted () {
+            this.fetchData()
+
+            setInterval(function () {
+                this.fetchData();
+            }.bind(this), 30000);
+        },
+        methods: {
+            getTotal () {
+                return (this.a == null || this.b == null || this.c == null)
+                    ? 'Input some vals!'
+                    : Number((this.b / this.a) * this.c).toFixed(2)
+            },
+            fetchData () {
+                this.$http.get('https://api.coinmarketcap.com/v1/ticker/?convert=GBP&limit=10').then(response => {
+                    // get body data
+                    // this.t = response.body[0].price_gbp
+                    // this.c = Number(this.t).toFixed(2)
+                    this.apiresult = response.body
+            }, response => {
+                    // error callback
+                })
+            }
+        }
+    })
+</script>
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+ <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+</body>
+</html>
